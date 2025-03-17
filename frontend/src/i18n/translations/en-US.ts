@@ -395,6 +395,9 @@ export default {
   "share.modal.file-preview.error.not-supported.description":
     "Previews are not supported for this type of files. Please download the file to view it.",
 
+  "share.view.list": "List",
+  "share.view.gallery": "Gallery",
+
   // END /share/[id]
 
   // /share/[id]/edit

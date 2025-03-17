@@ -28,10 +28,10 @@ const Footer = () => {
       <SimpleGrid cols={isMobile ? 2 : 3} m={0}>
         {!isMobile && <div></div>}
         <Text size="xs" color="dimmed" align={isMobile ? "left" : "center"}>
-          Powereded bye{" "}
+          Powered by{" "}
           <Anchor
             size="xs"
-            href="https://github.com/stonith404/pingvin-share"
+            href="https://github.com/maisonnavejul/Ryvie-rTransfer.git"
             target="_blank"
           >
             Jules Maisonnave

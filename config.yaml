@@ -22,7 +22,7 @@ share:
   #Default length for the generated ID of a share. This value is also used to generate links for reverse shares. A value below 8 is not considered secure.
   shareIdLength: "8"
   #Maximum share size
-  maxSize: "1000000000"
+  maxSize: "100000000000"
   #Adjust the level to balance between file size and compression speed. Valid values range from 0 to 9, with 0 being no compression and 9 being maximum compression. 
   zipCompressionLevel: "9"
   #Adjust the chunk size for your uploads to balance efficiency and reliability according to your internet connection. Smaller chunks can enhance success rates for unstable connections, while larger chunks make uploads faster for stable connections.
@@ -94,21 +94,7 @@ email:
 
 
     Pingvin Share 🐧
-smtp:
-  #Whether SMTP is enabled. Only set this to true if you entered the host, port, email, user and password of your SMTP server.
-  enabled: "false"
-  #Only set this to true if you need to trust self signed certificates.
-  allowUnauthorizedCertificates: "false"
-  #Host of the SMTP server
-  host: ""
-  #Port of the SMTP server
-  port: "0"
-  #Email address from wich the emails get sent
-  email: ""
-  #Username of the SMTP server
-  username: ""
-  #Password of the SMTP server
-  password: ""
+
 ldap:
   #Use LDAP authentication for user login
   enabled: "false"
