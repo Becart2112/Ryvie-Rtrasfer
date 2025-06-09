@@ -9,3 +9,13 @@ export type FileMetaData = {
 };
 
 export type FileListItem = FileUpload | (FileMetaData & { deleted?: boolean });
+
+export interface UploadedItem {
+  file: File;
+  rootDir: string | null; // null if upload of a single file
+}
+
+export type FolderUploadState = {
+  items: UploadedItem[];      // all files
+  folders: Set<string>;       // distinct root folders
+};

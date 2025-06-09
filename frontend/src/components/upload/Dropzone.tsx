@@ -4,7 +4,7 @@ import { ForwardedRef, useRef } from "react";
 import { TbCloudUpload, TbUpload } from "react-icons/tb";
 import { FormattedMessage } from "react-intl";
 import useTranslate from "../../hooks/useTranslate.hook";
-import { FileUpload } from "../../types/File.type";
+import { FileUpload, UploadedItem } from "../../types/File.type";
 import { byteToHumanSizeString } from "../../utils/fileSize.util";
 import toast from "../../utils/toast.util";
 
@@ -37,11 +37,13 @@ const Dropzone = ({
   isUploading,
   maxShareSize,
   onFilesChanged,
+  onFolderDetection,
 }: {
   title?: string;
   isUploading: boolean;
   maxShareSize: number;
   onFilesChanged: (files: FileUpload[]) => void;
+  onFolderDetection?: (items: UploadedItem[], folders: Set<string>) => void;
 }) => {
   const t = useTranslate();
 
@@ -70,6 +72,33 @@ const Dropzone = ({
               return newFile;
             });
             onFilesChanged(files);
+            
+            // Detect folders using webkitRelativePath and extract root directories
+            if (onFolderDetection) {
+              const uploadedItems: UploadedItem[] = [];
+              const folders = new Set<string>();
+              
+              files.forEach(file => {
+                // Use webkitRelativePath to get file path (if it's from a folder)
+                const relativePath = (file as any).webkitRelativePath || "";
+                let rootDir: string | null = null;
+                
+                if (relativePath) {
+                  // Extract root directory (first path segment)
+                  const pathParts = relativePath.split("/");
+                  if (pathParts.length > 1) {
+                    rootDir = pathParts[0];
+                    if (rootDir) {
+                      folders.add(rootDir);
+                    }
+                  }
+                }
+                
+                uploadedItems.push({ file, rootDir });
+              });
+              
+              onFolderDetection(uploadedItems, folders);
+            }
           }
         }}
         className={classes.dropzone}
@@ -86,6 +115,12 @@ const Dropzone = ({
             <FormattedMessage
               id="upload.dropzone.description"
               values={{ maxSize: byteToHumanSizeString(maxShareSize) }}
+            />
+          </Text>
+          <Text align="center" size="sm" mt="xs" color="dimmed">
+            <FormattedMessage 
+              id="upload.dropzone.folders"
+              defaultMessage="Drag entire folders here or click to select files"
             />
           </Text>
         </div>

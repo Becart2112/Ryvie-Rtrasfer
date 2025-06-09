@@ -8,13 +8,14 @@ import {
 } from "@mantine/core";
 import { TbTrash } from "react-icons/tb";
 import { GrUndo } from "react-icons/gr";
-import { FileListItem } from "../../types/File.type";
+import { FileListItem, UploadedItem } from "../../types/File.type";
 import { byteToHumanSizeString } from "../../utils/fileSize.util";
 import UploadProgressIndicator from "./UploadProgressIndicator";
 import { FormattedMessage } from "react-intl";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useTranslate from "../../hooks/useTranslate.hook";
 import UploadGalleryView from "./UploadGalleryView";
+import UploadFolderView from "./UploadFolderView";
 
 interface FileListRowProps {
   file: FileListItem;
@@ -72,14 +73,37 @@ const FileListRow = ({ file, onRemove, onRestore }: FileListRowProps) => {
 interface FileListProps<T extends FileListItem = FileListItem> {
   files: T[];
   setFiles: (files: T[]) => void;
+  uploadedItems?: UploadedItem[];
+  onFoldersUpdated?: (items: UploadedItem[], folders: Set<string>) => void;
 }
 
 const FileList = <T extends FileListItem = FileListItem>({
   files,
   setFiles,
+  uploadedItems,
+  onFoldersUpdated,
 }: FileListProps<T>) => {
   const t = useTranslate();
   const [viewMode, setViewMode] = useState<"list" | "gallery">("gallery");
+  const [folderItems, setFolderItems] = useState<UploadedItem[]>([]);
+  const [folders, setFolders] = useState<Set<string>>(new Set());
+  
+  // Initialize folder state if provided from parent component
+  useEffect(() => {
+    if (uploadedItems) {
+      setFolderItems(uploadedItems);
+      
+      // Extract folders from uploadedItems
+      const detectedFolders = new Set<string>();
+      uploadedItems.forEach(item => {
+        if (item.rootDir) {
+          detectedFolders.add(item.rootDir);
+        }
+      });
+      
+      setFolders(detectedFolders);
+    }
+  }, [uploadedItems]);
 
   const remove = (index: number) => {
     const newFiles = [...files];
@@ -106,9 +130,56 @@ const FileList = <T extends FileListItem = FileListItem>({
 
     setFiles(newFiles);
   };
+  
+  // Handle folder deletion - removes all files from that folder
+  const handleDeleteFolder = (folderName: string) => {
+    // Remove all files that belong to this folder
+    const newFiles = [...files];
+    const filesToKeep = [];
+    
+    // Find files with matching rootDir
+    for (let i = 0; i < newFiles.length; i++) {
+      const file = newFiles[i];
+      const matchingItem = folderItems.find(item => {
+        if (!item.file) return false;
+        // Compare names since file references may not be the same objects
+        return item.file.name === (file as any).name && 
+               item.rootDir === folderName;
+      });
+      
+      if (!matchingItem) {
+        // Keep file if it doesn't belong to the deleted folder
+        filesToKeep.push(file);
+      }
+    }
+    
+    setFiles(filesToKeep as T[]);
+    
+    // Update folder state
+    const newFolderItems = folderItems.filter(item => item.rootDir !== folderName);
+    setFolderItems(newFolderItems);
+    
+    const newFolders = new Set(folders);
+    newFolders.delete(folderName);
+    setFolders(newFolders);
+    
+    // Notify parent component if needed
+    if (onFoldersUpdated) {
+      onFoldersUpdated(newFolderItems, newFolders);
+    }
+  };
 
   return (
     <Stack spacing="md">
+      {/* Folder section - only shown when folders are detected */}
+      {folders.size > 0 && (
+        <UploadFolderView 
+          items={folderItems}
+          folders={folders}
+          onDeleteFolder={handleDeleteFolder}
+        />
+      )}
+      
       <Group position="right">
         <SegmentedControl
           value={viewMode}

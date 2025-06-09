@@ -3,7 +3,7 @@ import { useModals } from "@mantine/modals";
 import { cleanNotifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import pLimit from "p-limit";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 import Meta from "../../components/Meta";
 import Dropzone from "../../components/upload/Dropzone";
@@ -15,7 +15,7 @@ import useConfirmLeave from "../../hooks/confirm-leave.hook";
 import useTranslate from "../../hooks/useTranslate.hook";
 import useUser from "../../hooks/user.hook";
 import shareService from "../../services/share.service";
-import { FileUpload } from "../../types/File.type";
+import { FileUpload, UploadedItem, FolderUploadState } from "../../types/File.type";
 import { CreateShare, Share } from "../../types/share.type";
 import toast from "../../utils/toast.util";
 import { useRouter } from "next/router";
@@ -41,6 +41,12 @@ const Upload = ({
   const config = useConfig();
   const [files, setFiles] = useState<FileUpload[]>([]);
   const [isUploading, setisUploading] = useState(false);
+  
+  // State for folder detection
+  const [folderState, setFolderState] = useState<FolderUploadState>({
+    items: [],
+    folders: new Set<string>()
+  });
 
   useConfirmLeave({
     message: t("upload.notify.confirm-leave"),
@@ -159,6 +165,34 @@ const Upload = ({
       setFiles((oldArr) => [...oldArr, ...files]);
     }
   };
+  
+  // Handle folder detection from the Dropzone component
+  const handleFolderDetection = (items: UploadedItem[], folders: Set<string>) => {
+    setFolderState(prevState => {
+      // Create a new Set that includes both previous folders and new ones
+      const mergedFolders = new Set<string>(prevState.folders);
+      folders.forEach(folder => mergedFolders.add(folder));
+      
+      // Merge items, preventing duplicates based on file name
+      const existingFileNames = new Set(prevState.items.map(item => item.file.name));
+      const newItems = items.filter(item => !existingFileNames.has(item.file.name));
+      
+      return {
+        items: [...prevState.items, ...newItems],
+        folders: mergedFolders
+      };
+    });
+  };
+  
+  // Handle folder state updates from FileList
+  const handleFoldersUpdated = (items: UploadedItem[], folders: Set<string>) => {
+    // When folders are updated from FileList (like during deletion),
+    // we use the provided state directly as it already contains the correct data
+    setFolderState({
+      items,
+      folders
+    });
+  };
 
   useEffect(() => {
     // Check if there are any files that failed to upload
@@ -218,11 +252,17 @@ const Upload = ({
             : undefined
         }
         maxShareSize={maxShareSize}
-        onFilesChanged={handleDropzoneFilesChanged}
         isUploading={isUploading}
+        onFilesChanged={handleDropzoneFilesChanged}
+        onFolderDetection={handleFolderDetection}
       />
       {files.length > 0 && (
-        <FileList<FileUpload> files={files} setFiles={setFiles} />
+        <FileList 
+          files={files} 
+          setFiles={setFiles}
+          uploadedItems={folderState.items}
+          onFoldersUpdated={handleFoldersUpdated} 
+        />
       )}
     </>
   );
