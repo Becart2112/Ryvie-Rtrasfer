@@ -75,28 +75,65 @@ const Dropzone = ({
             
             // Detect folders using webkitRelativePath and extract root directories
             if (onFolderDetection) {
+              console.log("[Dropzone] Starting folder detection process");
+              console.log("[Dropzone] Browser/OS information:", navigator.userAgent);
+              console.log("[Dropzone] Files count:", files.length);
+              
               const uploadedItems: UploadedItem[] = [];
               const folders = new Set<string>();
               
-              files.forEach(file => {
+              // Debug first file properties
+              if (files.length > 0) {
+                console.log("[Dropzone] First file properties:", Object.keys(files[0]));
+                console.log("[Dropzone] WebkitRelativePath support:", 'webkitRelativePath' in files[0]);
+                console.log("[Dropzone] Path property support:", 'path' in files[0]);
+              }
+              
+              files.forEach((file, index) => {
                 // Use webkitRelativePath to get file path (if it's from a folder)
-                const relativePath = (file as any).webkitRelativePath || "";
+                const webkitPath = (file as any).webkitRelativePath || "";
+                const filePath = (file as any).path || "";
+                const relativePath = webkitPath || filePath || "";
+                
+                console.log(`[Dropzone] File ${index+1}/${files.length}: ${file.name}`);
+                console.log(`[Dropzone] - Type: ${file.type}`);
+                console.log(`[Dropzone] - Size: ${byteToHumanSizeString(file.size)}`);
+                console.log(`[Dropzone] - webkitRelativePath: "${webkitPath}"`);
+                console.log(`[Dropzone] - path property: "${filePath}"`);
+                console.log(`[Dropzone] - effective path: "${relativePath}"`);
+                
                 let rootDir: string | null = null;
                 
                 if (relativePath) {
                   // Extract root directory (first path segment)
                   const pathParts = relativePath.split("/");
+                  console.log(`[Dropzone] - path parts:`, pathParts);
+                  
                   if (pathParts.length > 1) {
-                    rootDir = pathParts[0];
+                    // Si le chemin commence par /, le premier élément sera vide
+                    // Dans ce cas, on prend le deuxième élément comme nom de dossier
+                    if (pathParts[0] === "" && pathParts.length > 2) {
+                      rootDir = pathParts[1];
+                      console.log(`[Dropzone] Path starts with /, using second part as folder name: ${rootDir}`);
+                    } else {
+                      rootDir = pathParts[0];
+                    }
+                    
                     if (rootDir) {
                       folders.add(rootDir);
+                      console.log(`[Dropzone] ✓ Added to folder "${rootDir}": ${file.name}`);
                     }
+                  } else {
+                    console.log(`[Dropzone] ✗ Not in a folder: ${file.name}`);
                   }
+                } else {
+                  console.log(`[Dropzone] ✗ No path information for: ${file.name}`);
                 }
                 
                 uploadedItems.push({ file, rootDir });
               });
               
+              console.log("[Dropzone] Folder detection complete. Found", folders.size, "root folders:", Array.from(folders));
               onFolderDetection(uploadedItems, folders);
             }
           }
