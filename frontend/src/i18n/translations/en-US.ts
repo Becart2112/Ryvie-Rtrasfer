@@ -308,6 +308,12 @@ export default {
   // FileList.tsx
   "upload.filelist.name": "Name",
   "upload.filelist.size": "Size",
+  "upload.filelist.progress": "Progress",
+
+  // Folder view
+  "upload.folders.title": "Folders",
+  "upload.folders.fileCount": "{count, plural, one {file} other {files}}",
+  "upload.folders.deleteFolder": "Delete folder",
 
   // showCreateUploadModal.tsx
   "upload.modal.title": "Create Share",

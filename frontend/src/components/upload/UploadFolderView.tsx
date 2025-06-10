@@ -13,6 +13,8 @@ interface FolderDisplayProps {
 }
 
 const FolderDisplay = ({ folderName, fileCount, totalSize, onDelete }: FolderDisplayProps) => {
+  const t = useTranslate();
+  
   return (
     <Card shadow="sm" p="md" withBorder>
       <Group position="apart">
@@ -22,7 +24,11 @@ const FolderDisplay = ({ folderName, fileCount, totalSize, onDelete }: FolderDis
             <Text weight={500}>{folderName}</Text>
             <Group spacing={5}>
               <Badge size="sm" variant="light">
-                {fileCount} {fileCount === 1 ? "file" : "files"}
+                {fileCount} <FormattedMessage 
+                  id="upload.folders.fileCount"
+                  defaultMessage="{count, plural, one {file} other {files}}"
+                  values={{ count: fileCount }}
+                />
               </Badge>
               <Text size="xs" color="dimmed">
                 {byteToHumanSizeString(totalSize)}
@@ -34,7 +40,7 @@ const FolderDisplay = ({ folderName, fileCount, totalSize, onDelete }: FolderDis
           color="red" 
           variant="light" 
           onClick={onDelete} 
-          title="Delete folder"
+          title={t("upload.folders.deleteFolder", { defaultMessage: "Delete folder" })}
         >
           <TbTrash size={18} />
         </ActionIcon>

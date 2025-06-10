@@ -227,6 +227,12 @@ export default {
   // FileList.tsx
   "upload.filelist.name": "Nom",
   "upload.filelist.size": "Taille",
+  "upload.filelist.progress": "Progression",
+
+  // Vue des dossiers
+  "upload.folders.title": "Dossiers",
+  "upload.folders.fileCount": "{count, plural, one {fichier} other {fichiers}}",
+  "upload.folders.deleteFolder": "Supprimer le dossier",
   // showCreateUploadModal.tsx
   "upload.modal.title": "Créer un partage",
   "upload.modal.link.error.invalid": "Ne peut contenir que des lettres, des chiffres, des tirets bas et des traits d'union",
