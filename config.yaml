@@ -4,7 +4,7 @@
 general:
   #Name of the application
   appName: rTransfer
-  #On which URL Pingvin Share is available
+  #On which URL rTransfer is available
   appUrl: http://localhost:3000
   #Whether to set the secure flag on cookies. If enabled, the site will not function when accessed over HTTP.
   secureCookies: "false"
@@ -55,7 +55,7 @@ email:
     Note: {desc}
 
 
-    Shared securely with Pingvin Share 🐧
+    Shared securely with rTransfer 🐧
   #Subject of the sent email when someone created a share with your reverse share link.
   reverseShareSubject: Reverse share link used
   #Message which gets sent when someone created a share with your reverse share link. {shareUrl} will be replaced with the creator's name and the share URL.
@@ -64,9 +64,9 @@ email:
 
     A share was just created with your reverse share link: {shareUrl}
 
-    Shared securely with Pingvin Share 🐧
+    Shared securely with rTransfer 🐧
   #Subject of the sent email when a user requests a password reset.
-  resetPasswordSubject: Pingvin Share password reset
+  resetPasswordSubject: rTransfer password reset
   #Message which gets sent when a user requests a password reset. {url} will be replaced with the reset password URL.
   resetPasswordMessage: >-
     Hey!
@@ -78,25 +78,25 @@ email:
     The link expires in a hour.
 
 
-    Pingvin Share 🐧
+    rTransfer 🐧
   #Subject of the sent email when an admin invites a user.
-  inviteSubject: Pingvin Share invite
+  inviteSubject: rTransfer invite
   #Message which gets sent when an admin invites a user. {url} will be replaced with the invite URL, {email} with the email and {password} with the users password.
   inviteMessage: >-
     Hey!
 
 
-    You were invited to Pingvin Share. Click this link to accept the invite:
+    You were invited to rTransfer. Click this link to accept the invite:
     {url}
 
 
     You can use the email "{email}" and the password "{password}" to sign in.
 
 
-    Pingvin Share 🐧
+    rTransfer 🐧
 ldap:
   enabled: "true"
-  url: ldap://172.10.0.1:389
+  url: ldap://172.17.0.1:389
   bindDn: cn=admin,dc=example,dc=org
   bindPassword: adminpassword
   searchBase: ou=users,dc=example,dc=org
