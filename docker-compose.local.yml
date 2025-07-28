@@ -1,5 +1,6 @@
 services:
   pingvin-share:
+    container_name: app-rtransfer
     build: .
     restart: unless-stopped
     ports:
