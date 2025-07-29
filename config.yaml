@@ -1,4 +1,4 @@
-#This configuration is pre-filled with the default values.
+#This configuration is pre-filled with the default values with lldp.
 #You can remove keys you don't want to set. If a key is missing, the value set in the UI will be used; if that is also unset, the default value applies.
 
 general:
