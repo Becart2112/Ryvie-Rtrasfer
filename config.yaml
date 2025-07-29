@@ -96,7 +96,7 @@ email:
     rTransfer 🐧
 ldap:
   enabled: "true"
-  url: ldap://172.17.0.1:389
+  url: ldap://openldap:1389
   bindDn: cn=admin,dc=example,dc=org
   bindPassword: adminpassword
   searchBase: ou=users,dc=example,dc=org
