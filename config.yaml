@@ -1,4 +1,4 @@
-#This configuration is pre-filled with the default values.
+#This configuration is pre-filled with the default values with lldp.
 #You can remove keys you don't want to set. If a key is missing, the value set in the UI will be used; if that is also unset, the default value applies.
 
 general:
@@ -96,7 +96,7 @@ email:
     rTransfer 🐧
 ldap:
   enabled: "true"
-  url: ldap://172.17.0.1:389
+  url: ldap://openldap:1389
   bindDn: cn=admin,dc=example,dc=org
   bindPassword: adminpassword
   searchBase: ou=users,dc=example,dc=org
