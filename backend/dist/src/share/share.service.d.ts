@@ -21,11 +21,11 @@ export declare class ShareService {
         name: string | null;
         id: string;
         createdAt: Date;
+        expiration: Date;
+        description: string | null;
         uploadLocked: boolean;
         isZipReady: boolean;
         views: number;
-        expiration: Date;
-        description: string | null;
         removedReason: string | null;
         creatorId: string | null;
         reverseShareId: string | null;
@@ -37,11 +37,11 @@ export declare class ShareService {
         name: string | null;
         id: string;
         createdAt: Date;
+        expiration: Date;
+        description: string | null;
         uploadLocked: boolean;
         isZipReady: boolean;
         views: number;
-        expiration: Date;
-        description: string | null;
         removedReason: string | null;
         creatorId: string | null;
         reverseShareId: string | null;
@@ -51,11 +51,11 @@ export declare class ShareService {
         name: string | null;
         id: string;
         createdAt: Date;
+        expiration: Date;
+        description: string | null;
         uploadLocked: boolean;
         isZipReady: boolean;
         views: number;
-        expiration: Date;
-        description: string | null;
         removedReason: string | null;
         creatorId: string | null;
         reverseShareId: string | null;
@@ -63,6 +63,13 @@ export declare class ShareService {
     }>;
     getShares(): Promise<{
         size: number;
+        files: {
+            name: string;
+            id: string;
+            createdAt: Date;
+            size: string;
+            shareId: string;
+        }[];
         creator: {
             updatedAt: Date;
             email: string;
@@ -76,21 +83,14 @@ export declare class ShareService {
             totpVerified: boolean;
             totpSecret: string | null;
         };
-        files: {
-            name: string;
-            id: string;
-            createdAt: Date;
-            size: string;
-            shareId: string;
-        }[];
         name: string | null;
         id: string;
         createdAt: Date;
+        expiration: Date;
+        description: string | null;
         uploadLocked: boolean;
         isZipReady: boolean;
         views: number;
-        expiration: Date;
-        description: string | null;
         removedReason: string | null;
         creatorId: string | null;
         reverseShareId: string | null;
@@ -113,11 +113,11 @@ export declare class ShareService {
         name: string | null;
         id: string;
         createdAt: Date;
+        expiration: Date;
+        description: string | null;
         uploadLocked: boolean;
         isZipReady: boolean;
         views: number;
-        expiration: Date;
-        description: string | null;
         removedReason: string | null;
         creatorId: string | null;
         reverseShareId: string | null;
@@ -128,11 +128,11 @@ export declare class ShareService {
         name: string | null;
         id: string;
         createdAt: Date;
+        expiration: Date;
+        description: string | null;
         uploadLocked: boolean;
         isZipReady: boolean;
         views: number;
-        expiration: Date;
-        description: string | null;
         removedReason: string | null;
         creatorId: string | null;
         reverseShareId: string | null;

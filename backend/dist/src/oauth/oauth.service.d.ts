@@ -21,14 +21,6 @@ export declare class OAuthService {
         };
     }>;
     signIn(user: OAuthSignInDto, ip: string): Promise<{
-        loginToken: string;
-        accessToken?: undefined;
-        refreshToken?: undefined;
-    } | {
-        accessToken: string;
-        refreshToken: string;
-        loginToken?: undefined;
-    } | {
         accessToken: string;
         refreshToken: string;
         user: {
@@ -44,6 +36,14 @@ export declare class OAuthService {
             totpVerified: boolean;
             totpSecret: string | null;
         };
+    } | {
+        loginToken: string;
+        accessToken?: undefined;
+        refreshToken?: undefined;
+    } | {
+        accessToken: string;
+        refreshToken: string;
+        loginToken?: undefined;
     }>;
     link(userId: string, provider: string, providerUserId: string, providerUsername: string): Promise<void>;
     unlink(user: User, provider: string): Promise<void>;

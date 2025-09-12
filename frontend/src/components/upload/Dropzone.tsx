@@ -12,23 +12,75 @@ const useStyles = createStyles((theme) => ({
   wrapper: {
     position: "relative",
     marginBottom: 30,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   dropzone: {
-    borderWidth: 1,
-    paddingBottom: 50,
+    position: "relative",
+    width: "30vw", // Adjust this value to make it scale with the viewport
+    height: "30vw", // Adjust this value to make it scale with the viewport
+    borderRadius: "50%",
+    border: `2px dashed ${
+      theme.colorScheme === "dark" ? theme.colors.gray[6] : theme.colors.gray[4]
+    }`,
+    background: theme.colorScheme === "dark"
+      ? "radial-gradient(circle at center, #2a2a40, #1a1a2e)"
+      : "radial-gradient(circle at center, #f8f9fa, #dee2e6)",
+    overflow: "hidden",
+    transition: "0.3s ease",
+    "&:hover": {
+      borderColor: theme.colors.violet[5],
+      boxShadow: `0 0 20px ${theme.colors.violet[6]}40`,
+    },
   },
+  
 
   icon: {
     color:
       theme.colorScheme === "dark"
-        ? theme.colors.dark[3]
-        : theme.colors.gray[4],
+        ? theme.colors.gray[3]
+        : theme.colors.gray[6],
   },
 
   control: {
     position: "absolute",
     bottom: -20,
+  },
+
+  content: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    color: theme.white,
+    textAlign: "center",
+    zIndex: 2,
+  },
+
+  bubbles: {
+    position: "absolute",
+    inset: 0,
+    overflow: "hidden",
+    borderRadius: "50%",
+    zIndex: 1,
+  },
+
+  bubble: {
+    position: "absolute",
+    bottom: -50,
+    width: 20,
+    height: 20,
+    background: "rgba(255, 255, 255, 0.08)",
+    borderRadius: "50%",
+    animation: "float 6s infinite ease-in-out",
+  },
+
+  "@keyframes float": {
+    "0%": { transform: "translateY(0) scale(1)", opacity: 0.4 },
+    "50%": { transform: "translateY(-100px) scale(1.1)", opacity: 0.8 },
+    "100%": { transform: "translateY(-220px) scale(0.9)", opacity: 0 },
   },
 }));
 
@@ -46,15 +98,13 @@ const Dropzone = ({
   onFolderDetection?: (items: UploadedItem[], folders: Set<string>) => void;
 }) => {
   const t = useTranslate();
-
-  const { classes } = useStyles();
+  const { classes, cx } = useStyles();
   const openRef = useRef<() => void>();
+
   return (
     <div className={classes.wrapper}>
       <MantineDropzone
-        onReject={(e) => {
-          toast.error(e[0].errors[0].message);
-        }}
+        onReject={(e) => toast.error(e[0].errors[0].message)}
         disabled={isUploading}
         openRef={openRef as ForwardedRef<() => void>}
         onDrop={(files: FileUpload[]) => {
@@ -72,96 +122,76 @@ const Dropzone = ({
               return newFile;
             });
             onFilesChanged(files);
-            
-            // Detect folders using webkitRelativePath and extract root directories
+
             if (onFolderDetection) {
-              console.log("[Dropzone] Starting folder detection process");
-              console.log("[Dropzone] Browser/OS information:", navigator.userAgent);
-              console.log("[Dropzone] Files count:", files.length);
-              
               const uploadedItems: UploadedItem[] = [];
               const folders = new Set<string>();
-              
-              // Debug first file properties
-              if (files.length > 0) {
-                console.log("[Dropzone] First file properties:", Object.keys(files[0]));
-                console.log("[Dropzone] WebkitRelativePath support:", 'webkitRelativePath' in files[0]);
-                console.log("[Dropzone] Path property support:", 'path' in files[0]);
-              }
-              
-              files.forEach((file, index) => {
-                // Use webkitRelativePath to get file path (if it's from a folder)
-                const webkitPath = (file as any).webkitRelativePath || "";
-                const filePath = (file as any).path || "";
-                const relativePath = webkitPath || filePath || "";
-                
-                console.log(`[Dropzone] File ${index+1}/${files.length}: ${file.name}`);
-                console.log(`[Dropzone] - Type: ${file.type}`);
-                console.log(`[Dropzone] - Size: ${byteToHumanSizeString(file.size)}`);
-                console.log(`[Dropzone] - webkitRelativePath: "${webkitPath}"`);
-                console.log(`[Dropzone] - path property: "${filePath}"`);
-                console.log(`[Dropzone] - effective path: "${relativePath}"`);
-                
+
+              files.forEach((file) => {
+                const relativePath =
+                  (file as any).webkitRelativePath ||
+                  (file as any).path ||
+                  "";
                 let rootDir: string | null = null;
-                
+
                 if (relativePath) {
-                  // Extract root directory (first path segment)
                   const pathParts = relativePath.split("/");
-                  console.log(`[Dropzone] - path parts:`, pathParts);
-                  
                   if (pathParts.length > 1) {
-                    // Si le chemin commence par /, le premier élément sera vide
-                    // Dans ce cas, on prend le deuxième élément comme nom de dossier
-                    if (pathParts[0] === "" && pathParts.length > 2) {
-                      rootDir = pathParts[1];
-                      console.log(`[Dropzone] Path starts with /, using second part as folder name: ${rootDir}`);
-                    } else {
-                      rootDir = pathParts[0];
-                    }
-                    
-                    if (rootDir) {
-                      folders.add(rootDir);
-                      console.log(`[Dropzone] ✓ Added to folder "${rootDir}": ${file.name}`);
-                    }
-                  } else {
-                    console.log(`[Dropzone] ✗ Not in a folder: ${file.name}`);
+                    rootDir =
+                      pathParts[0] === "" && pathParts.length > 2
+                        ? pathParts[1]
+                        : pathParts[0];
+                    if (rootDir) folders.add(rootDir);
                   }
-                } else {
-                  console.log(`[Dropzone] ✗ No path information for: ${file.name}`);
                 }
-                
                 uploadedItems.push({ file, rootDir });
               });
-              
-              console.log("[Dropzone] Folder detection complete. Found", folders.size, "root folders:", Array.from(folders));
+
               onFolderDetection(uploadedItems, folders);
             }
           }
         }}
         className={classes.dropzone}
-        radius="md"
       >
-        <div style={{ pointerEvents: "none" }}>
+        {/* Fond animé avec bulles */}
+        <div className={classes.bubbles}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <span
+              key={i}
+              className={classes.bubble}
+              style={{
+                left: `${20 + i * 15}%`,
+                width: `${10 + (i % 3) * 10}px`,
+                height: `${10 + (i % 3) * 10}px`,
+                animationDuration: `${4 + i}s`,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Contenu central */}
+        <div className={classes.content}>
           <Group position="center">
             <TbCloudUpload size={50} />
           </Group>
-          <Text align="center" weight={700} size="lg" mt="xl">
+          <Text weight={700} size="lg" mt="sm">
             {title || <FormattedMessage id="upload.dropzone.title" />}
           </Text>
-          <Text align="center" size="sm" mt="xs" color="dimmed">
+          <Text size="sm" mt="xs" color="dimmed">
             <FormattedMessage
               id="upload.dropzone.description"
               values={{ maxSize: byteToHumanSizeString(maxShareSize) }}
             />
           </Text>
-          <Text align="center" size="sm" mt="xs" color="dimmed">
-            <FormattedMessage 
+          <Text size="sm" mt="xs" color="dimmed">
+            <FormattedMessage
               id="upload.dropzone.folders"
               defaultMessage="Drag entire folders here or click to select files"
             />
           </Text>
         </div>
       </MantineDropzone>
+
       <Center>
         <Button
           className={classes.control}

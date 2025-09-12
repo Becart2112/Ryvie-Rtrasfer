@@ -11,8 +11,8 @@ export declare class ReverseShareService {
     getByToken(reverseShareToken?: string): Promise<{
         id: string;
         createdAt: Date;
-        token: string;
         creatorId: string;
+        token: string;
         shareExpiration: Date;
         maxShareSize: string;
         sendEmailNotification: boolean;
@@ -39,11 +39,11 @@ export declare class ReverseShareService {
             name: string | null;
             id: string;
             createdAt: Date;
+            expiration: Date;
+            description: string | null;
             uploadLocked: boolean;
             isZipReady: boolean;
             views: number;
-            expiration: Date;
-            description: string | null;
             removedReason: string | null;
             creatorId: string | null;
             reverseShareId: string | null;
@@ -52,8 +52,8 @@ export declare class ReverseShareService {
     } & {
         id: string;
         createdAt: Date;
-        token: string;
         creatorId: string;
+        token: string;
         shareExpiration: Date;
         maxShareSize: string;
         sendEmailNotification: boolean;
