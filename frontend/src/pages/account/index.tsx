@@ -44,6 +44,11 @@ const useStyles = createStyles((theme) => ({
     transition: 'box-shadow 0.2s',
     marginBottom: theme.spacing.xl,
   },
+  glassContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: theme.spacing.md,
+  },
   modernButton: {
     borderRadius: theme.radius.xl,
     boxShadow: '0 2px 8px 0 rgba(31, 38, 135, 0.10)',
