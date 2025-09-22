@@ -9,6 +9,33 @@ import { byteToHumanSizeString } from "../../utils/fileSize.util";
 import toast from "../../utils/toast.util";
 
 const useStyles = createStyles((theme) => ({
+  bubble: {
+    position: "absolute",
+    background: theme.colorScheme === "dark"
+      ? "rgba(60, 50, 120, 0.35)"
+      : "rgba(120, 119, 198, 0.22)",
+    borderRadius: "50%",
+    filter: "blur(0.5px)",
+    opacity: 0.7,
+    willChange: "transform, opacity",
+    transition: "background 0.3s, opacity 0.3s",
+     // Eclaircir au hover de la dropzone
+    [`.${theme.other?.dropzoneClassName || 'mantine-Dropzone-root'}:hover &`]: {
+      background: theme.colorScheme === "dark"
+        ? "rgba(120, 119, 198, 0.40)"
+        : "rgba(169, 146, 255, 0.27)",
+      opacity: 0.82,
+    },
+  },
+  bubbles: {
+    position: "absolute",
+    inset: 0,
+    pointerEvents: "none",
+    borderRadius: "50%",
+    zIndex: 1,
+    overflow: "hidden",
+  },
+
   wrapper: {
     position: "relative",
     marginBottom: 30,
@@ -19,20 +46,19 @@ const useStyles = createStyles((theme) => ({
 
   dropzone: {
     position: "relative",
-    width: "30vw", // Adjust this value to make it scale with the viewport
-    height: "30vw", // Adjust this value to make it scale with the viewport
+    width: 380,
+    height: 380,
     borderRadius: "50%",
-    border: `2px dashed ${
-      theme.colorScheme === "dark" ? theme.colors.gray[6] : theme.colors.gray[4]
-    }`,
+    border: `2px solid #a992ff` ,
     background: theme.colorScheme === "dark"
-      ? "radial-gradient(circle at center, #2a2a40, #1a1a2e)"
-      : "radial-gradient(circle at center, #f8f9fa, #dee2e6)",
-    overflow: "hidden",
-    transition: "0.3s ease",
+      ? "radial-gradient(circle at 50% 50%, #232347 60%, #18182f 100%)"
+      : "radial-gradient(circle at 50% 50%, #f8f9fa 60%, #dee2e6 100%)",
+    boxShadow: "0 0 24px 4px #a992ff33, 0 0 0 20px rgba(169,146,255,0.04)",
+    overflow: "visible",
+    transition: "box-shadow 0.3s, border-color 0.3s;",
     "&:hover": {
       borderColor: theme.colors.violet[5],
-      boxShadow: `0 0 20px ${theme.colors.violet[6]}40`,
+      boxShadow: `0 0 48px 16px #6c5fcf33, 0 0 0 40px rgba(80,60,180,0.06)`
     },
   },
   
@@ -46,7 +72,25 @@ const useStyles = createStyles((theme) => ({
 
   control: {
     position: "absolute",
-    bottom: -20,
+    left: "50%",
+    bottom: -32,
+    transform: "translateX(-50%)",
+    zIndex: 10,
+    background: "#fff",
+    boxShadow: "0 4px 24px 0 rgba(120,119,198,0.18)",
+    borderRadius: "50%",
+    width: 40,
+    height: 40,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: 20,
+    border: "2.5px solid #a992ff",
+    color: theme.colors.violet[6],
+    transition: "box-shadow 0.2s",
+    '&:hover': {
+      boxShadow: `0 0 16px ${theme.colors.violet[5]}55` ,
+    },
   },
 
   content: {
@@ -59,28 +103,11 @@ const useStyles = createStyles((theme) => ({
     zIndex: 2,
   },
 
-  bubbles: {
-    position: "absolute",
-    inset: 0,
-    overflow: "hidden",
-    borderRadius: "50%",
-    zIndex: 1,
-  },
-
-  bubble: {
-    position: "absolute",
-    bottom: -50,
-    width: 20,
-    height: 20,
-    background: "rgba(255, 255, 255, 0.08)",
-    borderRadius: "50%",
-    animation: "float 6s infinite ease-in-out",
-  },
-
-  "@keyframes float": {
-    "0%": { transform: "translateY(0) scale(1)", opacity: 0.4 },
-    "50%": { transform: "translateY(-100px) scale(1.1)", opacity: 0.8 },
-    "100%": { transform: "translateY(-220px) scale(0.9)", opacity: 0 },
+  '@keyframes float-bubble': {
+    '0%': { transform: 'translateY(0) scale(1)', opacity: 0.4 },
+    '40%': { opacity: 0.8 },
+    '60%': { transform: 'translateY(-80px) scale(1.15)', opacity: 0.9 },
+    '100%': { transform: 'translateY(-160px) scale(0.85)', opacity: 0 },
   },
 }));
 
@@ -153,37 +180,65 @@ const Dropzone = ({
         }}
         className={classes.dropzone}
       >
-        {/* Fond animé avec bulles */}
+        {/* Bulles animées */}
         <div className={classes.bubbles}>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <span
-              key={i}
-              className={classes.bubble}
-              style={{
-                left: `${20 + i * 15}%`,
-                width: `${10 + (i % 3) * 10}px`,
-                height: `${10 + (i % 3) * 10}px`,
-                animationDuration: `${4 + i}s`,
-              }}
-            />
-          ))}
+          {Array.from({ length: 36 }).map((_, i) => {
+            // Génère une position de départ aléatoire dans le cercle (coordonnées polaires)
+            const r = 150 * Math.sqrt(Math.random()); // rayon max = 150px (pour 380px de diamètre)
+            const theta = Math.random() * 2 * Math.PI;
+            const x = 190 + r * Math.cos(theta); // 190 = rayon + padding
+            const y = 190 + r * Math.sin(theta);
+            const size = 16 + Math.random() * 24;
+            const duration = 6 + Math.random() * 5;
+            const delay = Math.random() * 4;
+            // Animation keyframes dynamiques pour chaque bulle
+            const moveX = (Math.random() - 0.5) * 60;
+            const moveY = (Math.random() - 0.5) * 60;
+            const keyframes = `@keyframes bubble-move-${i} {
+              0% { transform: translate(0px, 0px) scale(1); opacity: 0.5; }
+              30% { opacity: 0.8; }
+              60% { transform: translate(${moveX}px, ${moveY}px) scale(1.15); opacity: 0.9; }
+              100% { transform: translate(${moveX * 1.5}px, ${moveY * 1.5}px) scale(0.85); opacity: 0; }
+            }`;
+            // Injecte les keyframes dans le document (évite les collisions)
+            if (typeof window !== 'undefined' && !document.getElementById(`bubble-move-style-${i}`)) {
+              const style = document.createElement('style');
+              style.id = `bubble-move-style-${i}`;
+              style.innerHTML = keyframes;
+              document.head.appendChild(style);
+            }
+            return (
+              <span
+                key={i}
+                className={classes.bubble}
+                style={{
+                  left: x - size / 2,
+                  top: y - size / 2,
+                  width: `${size}px`,
+                  height: `${size}px`,
+                  animation: `bubble-move-${i} ${duration}s infinite cubic-bezier(.4,2,.6,1)`,
+                  animationDelay: `${delay}s`,
+                }}
+              />
+            );
+          })}
         </div>
 
         {/* Contenu central */}
         <div className={classes.content}>
           <Group position="center">
-            <TbCloudUpload size={50} />
+              <TbCloudUpload size={32} />
           </Group>
-          <Text weight={700} size="lg" mt="sm">
+            <Text weight={700} size="md" mt="sm">
             {title || <FormattedMessage id="upload.dropzone.title" />}
           </Text>
-          <Text size="sm" mt="xs" color="dimmed">
+            <Text size="xs" mt="xs" color="dimmed">
             <FormattedMessage
               id="upload.dropzone.description"
               values={{ maxSize: byteToHumanSizeString(maxShareSize) }}
             />
           </Text>
-          <Text size="sm" mt="xs" color="dimmed">
+            <Text size="xs" mt="xs" color="dimmed">
             <FormattedMessage
               id="upload.dropzone.folders"
               defaultMessage="Drag entire folders here or click to select files"
@@ -192,18 +247,15 @@ const Dropzone = ({
         </div>
       </MantineDropzone>
 
-      <Center>
-        <Button
-          className={classes.control}
-          variant="light"
-          size="sm"
-          radius="xl"
-          disabled={isUploading}
-          onClick={() => openRef.current && openRef.current()}
-        >
-          {<TbUpload />}
-        </Button>
-      </Center>
+      <button
+        className={classes.control}
+        disabled={isUploading}
+        onClick={() => openRef.current && openRef.current()}
+        aria-label="upload"
+        type="button"
+      >
+        <TbUpload size={18} />
+      </button>
     </div>
   );
 };

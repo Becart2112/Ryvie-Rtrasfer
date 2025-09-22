@@ -2,7 +2,8 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/auth/signIn": "pages/auth/signIn.js",
+  "/upload": "pages/upload.js",
+  "/account": "pages/account.js",
   "/api/[...all]": "pages/api/[...all].js",
-  "/upload": "pages/upload.js"
+  "/account/shares": "pages/account/shares.js"
 }

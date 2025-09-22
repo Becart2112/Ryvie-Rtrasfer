@@ -39,11 +39,11 @@ export declare class ReverseShareService {
             name: string | null;
             id: string;
             createdAt: Date;
-            expiration: Date;
-            description: string | null;
             uploadLocked: boolean;
             isZipReady: boolean;
             views: number;
+            expiration: Date;
+            description: string | null;
             removedReason: string | null;
             creatorId: string | null;
             reverseShareId: string | null;
